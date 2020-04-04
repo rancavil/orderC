@@ -2,7 +2,7 @@
 
 *OrderC* is a C module extension that order python list objects using functions written in C.
 
-The aim of this module is show how to write an extension in C to extends the functionalities of Python. It is a silly example, but you will be able to see the best of both worlds.
+The aim of this module is to show how to write an extension in C to extend the Power of Python. It is a silly example, but you will be able to see the best of both worlds.
 
 Just enjoy.
 
