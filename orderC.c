@@ -112,7 +112,6 @@ PyObject* selectionC(PyObject *self, PyObject *args) {
 		        PyErr_SetString(orderCError,"There is an element that is not integer, all elements must be int");
 			Py_DECREF(pylist);
 			free(list);
-			Py_INCREF(Py_None);
 			return NULL;
 		}
 		list[i] = PyLong_AsLong(item);
