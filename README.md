@@ -8,13 +8,13 @@ Just enjoy.
 
 ## Instaling OrderC
 
-     $ pip3 install git+https://github.com/rancavil/orderC.git
+      $ pip3 install git+https://github.com/rancavil/orderC.git
 
 or 
 
-     $ git clone https://github.com/rancavil/orderC.git
-     $ cd orderC
-     $ sudo python3 setup.py install
+      $ git clone https://github.com/rancavil/orderC.git
+      $ cd orderC
+      $ sudo python3 setup.py install
 
 *Note:* You can use python 2 or 3.
 
