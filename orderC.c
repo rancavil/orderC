@@ -24,11 +24,17 @@
 #include <errno.h>
 
 #define VERSION 1.0
+#if PY_MAJOR_VERSION >= 3
+#define Int_Check(value) ( PyLong_Check(value) )
+#else
+#define Int_Check(value) ( PyInt_Check(value) )
+#endif
 
 static PyObject *orderCError;
 
 void swap(int *x, int *y);
 void bubble(int arr[], int n); 
+void selection(int arr[], int n); 
 
 PyObject* bubbleC(PyObject *self, PyObject *args) {
 	PyObject *pylist;
@@ -53,11 +59,67 @@ PyObject* bubbleC(PyObject *self, PyObject *args) {
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
+		if(!Int_Check(item)) {
+		        PyErr_SetString(orderCError,"There is an element that is not integer, all elements must be int");
+			Py_DECREF(pylist);
+			free(list);
+			return NULL;
+		}
 		list[i] = PyLong_AsLong(item);
 	}
 
 	/* order: bubble sort */
 	bubble(list,len);
+
+	/* load result */
+	for(i=0;i<len;i++) {
+		PyObject *item = Py_BuildValue("i",list[i]);
+		if(!item) {
+			Py_INCREF(Py_None);
+			free(list);
+			return Py_None;
+		}
+
+		PyList_SetItem(order_list,i,item);
+	}
+	return order_list;
+}
+
+PyObject* selectionC(PyObject *self, PyObject *args) {
+	PyObject *pylist;
+	int *list;
+	int len;
+	int i=0;
+
+	if(!PyArg_ParseTuple(args,"O",&pylist) || !PyList_Check(pylist)) {
+		PyErr_SetString(orderCError,"Invalid list");
+		return NULL;
+	}
+	len  = PySequence_Fast_GET_SIZE(pylist);
+	list = malloc(len*sizeof(int));
+
+	/* load c list */
+	PyObject* order_list = PyList_New(len);
+	for(i=0;i<len;i++) {
+		PyObject *item = PySequence_Fast_GET_ITEM(pylist,i);
+		if(!item) {
+			Py_DECREF(pylist);
+			free(list);
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		if(!Int_Check(item)) {
+		        PyErr_SetString(orderCError,"There is an element that is not integer, all elements must be int");
+			Py_DECREF(pylist);
+			free(list);
+			Py_INCREF(Py_None);
+			return NULL;
+		}
+		list[i] = PyLong_AsLong(item);
+	}
+
+	/* order: selection sort */
+	selection(list,len);
 
 	/* load result */
 	for(i=0;i<len;i++) {
@@ -89,6 +151,20 @@ void bubble(int arr[], int n)
               swap(&arr[j], &arr[j+1]); 
 } 
 
+void selection(int arr[], int n)
+{
+    int i, j, min_idx;
+
+    for (i = 0; i < n-1; i++)
+    {
+        min_idx = i;
+        for (j = i+1; j < n; j++)
+          if (arr[j] < arr[min_idx])
+            min_idx = j;
+        swap(&arr[min_idx], &arr[i]);
+    }
+}
+
 struct module_state {
     PyObject *error;
 };
@@ -107,7 +183,8 @@ static PyObject *error_out(PyObject *m) {
 }
 
 static PyMethodDef Methods[] = {
- {"bubbleC",bubbleC,METH_VARARGS,"method to order a list"},
+ {"bubbleC",bubbleC,METH_VARARGS,"bubble algorithm to order a list"},
+ {"selectionC",bubbleC,METH_VARARGS,"selection algorithm to order a list"},
  {"error_out", (PyCFunction)error_out, METH_NOARGS, NULL},
  {NULL,NULL,0,NULL}
 };
